@@ -1,0 +1,170 @@
+<!-- Adding the layout -->
+<% layout('layouts/boilerplate') -%>
+    <!-- Add stylesheet stars.css -->
+    <link rel="stylesheet" href="/stylesheets/stars.css">
+    <!-- Add stylesheet app.css for styling our map -->
+    <link rel="stylesheet" href="/stylesheets/app.css">
+    <div class="row d-flex justify-content-center">
+        <!-- DISPLAYING THE CAMPGROUND USING CARD-->
+        <div class="col-lg-6 mb-3">
+            <div class="card">
+                <% if(campground.images.length> 0) { %>
+                    <!-- DISPLAYING IMAGES OF THE CAMPGROUND USING CAROUSEL -->
+                    <div id="carouselExampleInterval" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+
+                            <% campground.images.forEach((img,i)=>{ %>
+                                <div class="carousel-item <%= i==0 ? 'active':'' %>" data-bs-interval="10000">
+                                    <a href="<%=img.url%>"><img src="<%=img.url%>" alt="" class="d-block w-100 pointer"
+                                            title="Click to view Image" crossorigin></a>
+                                </div>
+                                <% })%>
+                        </div>
+                        <% if(campground.images.length>1){ %>
+                            <button class="carousel-control-prev" type="button"
+                                data-bs-target="#carouselExampleInterval" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button"
+                                data-bs-target="#carouselExampleInterval" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                            <% } %>
+                    </div>
+                    <% } else{%>
+                        <img src="https://res.cloudinary.com/dbmrc41ir/image/upload/v1676299816/YelpCamp/df48rbajgpazpzsh9zg5.avif"
+                            alt="No Image Available" class="img-fluid" crossorigin>
+                        <% } %>
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <%= campground.title %>
+                                </h5>
+                                <p class="card-text">
+                                    <%= campground.description %>
+                                </p>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item text-muted">
+                                    <%= campground.location %>
+                                </li>
+                                <li class="list-group-item">Sbumitted by-
+                                    <b>
+                                        <%= campground.author.username %>
+                                    </b>
+                                </li>
+                                <li class="list-group-item">Price- $<%= campground.price %>/night</li>
+                            </ul>
+                            <!-- GIVING ACCESS TO EDIT/DELETE BUTTONS FOR A CAMPGROUND IF CURRENT USER IS AUTHOR -->
+                            <% if(currentUser && (campground.author.equals(currentUser._id))){ %>
+                                <div class="card-body">
+                                    <a class="card-link btn btn-info"
+                                        href="/campgrounds/<%= campground._id %>/edit ">Edit</a>
+                                    <form class="d-inline" action="/campgrounds/<%= campground._id%>?_method=DELETE "
+                                        method="post">
+                                        <button class="btn btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                                <% } %>
+                                    <div class="card-footer">2 days ago </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <!-- DISPLAYING THE MAP OF CURRENT CAMPGROUND -->
+            <div id="map" class="mb-3"></div>
+            <% if(campground.reviews.length===0){ %>
+                No reviews Yet!
+                <% } %>
+                    <h2>Leave a Review</h2>
+                    <!--DISPLAYING THE FORM TO SUBMIT A REVIEW IF USER EXISTS -->
+                    <% if(currentUser){ %>
+                        <form action="/campgrounds/<%= campground._id%>/reviews " method="post"
+                            class="mb-3 validate-form" novalidate>
+                            <div class="mb-2    ">
+                                <fieldset class="starability-basic">
+                                    <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]"
+                                        value="1" checked aria-label="No rating." />
+                                    <input type="radio" id="first-rate1" name="review[rating]" value="1" />
+                                    <label for="first-rate1" title="Terrible">1 star</label>
+                                    <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+                                    <label for="first-rate2" title="Not good">2 stars</label>
+                                    <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+                                    <label for="first-rate3" title="Average">3 stars</label>
+                                    <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+                                    <label for="first-rate4" title="Very good">4 stars</label>
+                                    <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+                                    <label for="first-rate5" title="Amazing">5 stars</label>
+                                </fieldset>
+                            </div>
+                            <div class="mb-3">
+                                <label for="body" class="form-label">Review Text</label>
+                                <textarea name="review[body]" class="form-control" id="body" cols="30" rows="3"
+                                    required></textarea>
+                                <div class="valid-feedback">
+                                    Looks good!
+                                </div>
+                            </div>
+                            <button class="btn btn-success">Submit</button>
+                        </form>
+                        <!-- IF A USER DOESNOT EXISTS THEN DISPLAYING LOGIN AND REGISTER BUTTONS FOR A CAMPGROUND -->
+                        <% }else{ %>
+                            <a href="/login" class="btn btn-secondary">Login</a>
+                            <a href="/register" class="btn btn-info">Register</a>
+                            <% } %>
+                                <% if(campground.reviews.length>=1){ %>
+                                    <% for(let review of campground.reviews){ %>
+                                        <div class="card mb-3">
+                                            <div class="card-body">
+                                                <h6 class="card-subtitle mb-2 ">
+                                                    <%=review.author.username %>
+                                                </h6>
+                                                <p class="starability-result" data-rating="<%=review.rating%>">
+                                                    Rated: 3 stars
+                                                </p>
+                                                <p class="card-text">Review:
+                                                    <%= review.body %>
+                                                </p>
+                                                <% if(currentUser && review.author.equals(currentUser._id)){ %>
+                                                    <form
+                                                        action="/campgrounds/<%= campground._id %>/reviews/<%= review._id %>?_method=DELETE  "
+                                                        method="post">
+                                                        <button class="btn btn-sm btn-danger">Delete</button>
+                                                    </form>
+                                                    <% } %>
+                                            </div>
+                                        </div>
+                                        <% } %>
+                                            <% } %>
+                                                <a href="/campgrounds" class="btn btn-danger mb-2">Back</a>
+
+
+        </div>
+        <!-- DISPLAYING MAP FOR A CAMPGROUND USING JAVASCRIPT -->
+        <script>
+            // ACCESSING CAMPGROUND AND MAPTOKEN
+            let mapboxToken = `<%-process.env.MAPBOX_TOKEN%>`;
+            let campground = `<%-JSON.stringify(campground)%>`;
+            mapboxgl.accessToken = mapboxToken;
+            campground = JSON.parse(campground);
+
+            // STARTING LOCATION AS COORDINATES OF CAMPGROUND
+            const map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/streets-v12',
+                center: campground.geometry.coordinates,
+                zoom: 11
+            });
+            map.addControl(new mapboxgl.NavigationControl());
+            //ADDING THE PATH 
+            new mapboxgl.Marker()
+                .setLngLat(campground.geometry.coordinates)
+                // WHEN A USER CLICKED AT POINTER THEN POPUP COMES WITH CAMPGROUND TITLE AND LOCATION
+                .setPopup(
+                    new mapboxgl.Popup({ offset: 25 })
+                        .setHTML(
+                            `<h3>${campground.title}</h3><P>${campground.location}</P>`
+                        )
+                )
+                .addTo(map)
+        </script>
