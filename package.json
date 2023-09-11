@@ -8,15 +8,11 @@
     "start": "node CampsiteScouter.js"
   },
   "repository": {
-    "type": "git",
-     "url": ""
-  },
+    "type": "git"
+    },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": ""
-  },
   "homepage": "",
   "dependencies": {
     "@mapbox/mapbox-sdk": "^0.15.0",
