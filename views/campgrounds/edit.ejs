@@ -2,13 +2,13 @@
 <% layout('layouts/boilerplate') -%>
 
   <!-- Row -->
-  <div class="row " style="background-color:  rgb(157, 213, 251)">
+  <div class="row">
 
     <h1 class="text-center">Edit Camground</h1>
 
     <!--Centering the form to the center by using offset   -->
-    <div class="col-md-6 offset-md-3 bg-dark p-2 mb-3 container " style="color: white; border-radius: 20px;">
-      <form action="/campgrounds/<%= campground._id %>/edit?_method=PUT " method="post" class="validate-form p-4 mb-3"
+    <div class="col-md-6 offset-md-3">
+      <form action="/campgrounds/<%= campground._id %>/edit?_method=PUT " method="post" class="validate-form"
         novalidate>
 
         <!-- Campground Title -->
@@ -68,4 +68,3 @@
       </div>
     </div>
   </div>
-
